@@ -922,7 +922,7 @@
             // --- DATA IMPORT/EXPORT ---
             window.backupData = async () => {
                 const dataStr = JSON.stringify({ portals }, null, 2);
-                const zip = new JSZip(); zip.file("backup.json", dataStr);
+                const zip = new JSZip(); zip.file("uranusfazry_backup.json", dataStr); // Updated internal filename
                 const content = await zip.generateAsync({type:"blob"});
                 const url = URL.createObjectURL(content);
                 const a = document.createElement('a'); a.href = url; a.download = 'uranusfazry_backup.zip';
@@ -935,11 +935,24 @@
                     let json;
                     if(file.name.endsWith('.zip')) {
                         const zip = await JSZip.loadAsync(file);
-                        json = await zip.file("backup.json").async("string");
+                        // Try loading the new filename, fallback to old filename for backward compatibility
+                        const newFile = zip.file("uranusfazry_backup.json");
+                        const oldFile = zip.file("backup.json");
+                        
+                        if (newFile) {
+                            json = await newFile.async("string");
+                        } else if (oldFile) {
+                            json = await oldFile.async("string");
+                        } else {
+                            throw new Error("File backup tidak ditemukan dalam ZIP");
+                        }
                     } else { json = await file.text(); }
                     const data = JSON.parse(json);
                     if(data.portals) { localStorage.setItem('portals', JSON.stringify(data.portals)); location.reload(); }
-                } catch(err) { showNotification('Error', 'Invalid Backup File', 'error'); }
+                } catch(err) { 
+                    console.error(err);
+                    showNotification('Error', 'Invalid Backup File', 'error'); 
+                }
             };
 
             // --- SMART LINK & QR ---
