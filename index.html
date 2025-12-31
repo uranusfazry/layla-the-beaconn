@@ -371,6 +371,39 @@
 
         .hide-capacity { opacity: 0; max-height: 0; margin: 0; padding: 0; overflow: hidden; transition: all 0.5s ease; }
 
+        /* =========================================
+           FIX HOVER UI (OVERRIDE - PRIORITAS TINGGI)
+           ========================================= */
+        
+        /* FIX Hover - Teks Hilang di Background Gelap */
+        .btn-neon,
+        .btn-secondary,
+        .nav-item button,
+        .nav-item span,
+        .nav-item i {
+            color: #ffffff !important; 
+        }
+
+        /* Saat hover, wajib terlihat (Efek Neon MLBB) */
+        .btn-neon:hover,
+        .btn-secondary:hover,
+        .nav-item:hover button,
+        .nav-item:hover span,
+        .nav-item:hover i {
+            color: #00eaff !important;            /* teks neon terang */
+            border-color: #00eaff !important;     /* garis ikut menyala */
+            text-shadow: 0 0 10px #00eaff !important;
+            background: rgba(0, 238, 255, 0.15) !important;
+            cursor: pointer !important;
+        }
+
+        /* FIX area tidak ke-klik / ketiban layer */
+        .btn-neon, .btn-secondary, .nav-item {
+            z-index: 10 !important;
+            position: relative !important;
+            pointer-events: auto !important;
+        }
+
     </style>
 </head>
 <body>
@@ -892,7 +925,7 @@
                 const zip = new JSZip(); zip.file("backup.json", dataStr);
                 const content = await zip.generateAsync({type:"blob"});
                 const url = URL.createObjectURL(content);
-                const a = document.createElement('a'); a.href = url; a.download = 'portal_backup.zip';
+                const a = document.createElement('a'); a.href = url; a.download = 'uranusfazry_backup.zip';
                 document.body.appendChild(a); a.click(); document.body.removeChild(a);
             };
             window.importData = () => importFileInput.click();
