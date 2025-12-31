@@ -664,9 +664,11 @@
                     <span>Capacity</span>
                     <span id="capacity-text">0%</span>
                 </div>
-                <div class="w-full h-2 bg-gray-700 rounded overflow-hidden">
+                <div class="w-full h-2 bg-gray-700 rounded overflow-hidden mb-1">
                     <div id="capacity-bar" class="h-full bg-blue-500 transition-all duration-500" style="width: 0%"></div>
                 </div>
+                <!-- Added detail element -->
+                <div id="capacity-detail" class="text-[10px] text-gray-400 text-right font-rajdhani">Menghitung...</div>
             </div>
 
             <div class="space-y-3">
@@ -959,15 +961,32 @@
             window.generateSmartLink = function() {
                 const encoded = UrlManager.encode(portals);
                 if(encoded) {
-                    currentGeneratedUrl = `${window.location.origin}${window.location.pathname}?p=v5_${encoded}`;
+                    // Logic calc length based on v5_ parameter
+                    const finalParam = `v5_${encoded}`;
+                    currentGeneratedUrl = `${window.location.origin}${window.location.pathname}?p=${finalParam}`;
+                    
                     document.getElementById('generated-smart-link').value = currentGeneratedUrl;
                     document.getElementById('smart-link-modal').classList.remove('hidden');
                     
-                    const MAX_LEN = 2900; 
-                    const pct = Math.min(100, Math.round((encoded.length / MAX_LEN) * 100));
-                    document.getElementById('capacity-bar').style.width = pct + '%';
-                    document.getElementById('capacity-text').innerText = pct + '%';
+                    // Updated Capacity Logic (Hayabusa Style)
+                    const MAX_QR_LENGTH = 2900;
+                    const used = finalParam.length;
+                    const percent = Math.min(100, Math.round((used / MAX_QR_LENGTH) * 100));
                     
+                    document.getElementById('capacity-bar').style.width = percent + "%";
+                    document.getElementById('capacity-text').textContent = percent + "%";
+                    
+                    const detailEl = document.getElementById('capacity-detail');
+                    if(detailEl) {
+                        detailEl.textContent = `Terpakai: ${used}/${MAX_QR_LENGTH} karakter`;
+                    }
+                    
+                    // Change bar color if near limit
+                    const barEl = document.getElementById('capacity-bar');
+                    if (percent > 90) barEl.style.backgroundColor = 'var(--error-red)';
+                    else if (percent > 70) barEl.style.backgroundColor = 'orange';
+                    else barEl.style.backgroundColor = 'var(--neon-blue)';
+
                     renderQR(currentGeneratedUrl);
                 }
             };
