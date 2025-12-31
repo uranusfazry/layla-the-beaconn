@@ -963,14 +963,22 @@
                 if(encoded) {
                     // Logic calc length based on v5_ parameter
                     const finalParam = `v5_${encoded}`;
+                    const MAX_QR_LENGTH = 2900;
+                    const used = finalParam.length;
+
+                    // --- STRICT CHECK (HAYABUSA STYLE) ---
+                    // Jika melebihi batas, hentikan proses total.
+                    if(used > MAX_QR_LENGTH) {
+                        showNotification('Kapasitas Penuh', `Data melebihi batas QR (${used}/${MAX_QR_LENGTH}). Hapus beberapa portal.`, 'error');
+                        return; // Stop execution completely
+                    }
+
+                    // Jika lolos check, baru lanjut generate URL & buka modal
                     currentGeneratedUrl = `${window.location.origin}${window.location.pathname}?p=${finalParam}`;
                     
                     document.getElementById('generated-smart-link').value = currentGeneratedUrl;
                     document.getElementById('smart-link-modal').classList.remove('hidden');
                     
-                    // Updated Capacity Logic (Hayabusa Style)
-                    const MAX_QR_LENGTH = 2900;
-                    const used = finalParam.length;
                     const percent = Math.min(100, Math.round((used / MAX_QR_LENGTH) * 100));
                     
                     document.getElementById('capacity-bar').style.width = percent + "%";
